@@ -6,7 +6,7 @@
 
 // anime.js is referenced here https://animejs.com/ also under MIT license
 
-function createHypeType(aniName, aniFnc,speed){
+function createHypeType(aniName, aniFnc, speed) {
     window.widget.compositeFields.registerCompositeFieldProvider({
         // register details that will be exposed to "add component" in the editor
         getCompositeFieldMetadata: () => ({
@@ -22,7 +22,9 @@ function createHypeType(aniName, aniFnc,speed){
             // Define the HTML strucutre for your custom composite text field
 
             const htmlElement = document.createElement("div");
-            htmlElement.id = slugify(compositeFieldId);
+            const elementId = slugify(compositeFieldId);
+            htmlElement.setAttribute('id', elementId);
+
             // parse the config.json
             const field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field
             const aniSpeed=speed;
@@ -33,8 +35,11 @@ function createHypeType(aniName, aniFnc,speed){
                 // set style to the main element
                 Object.assign(htmlElement.style, field.style);
                  // interpulate the binded data and split the text into single letter spans
+                 
                 field.text?.forEach(({ content }) => {
                     widget.api.interpolateTextContentComponents({ textContent: content }).forEach((component) => {
+                      console.log(component);
+
                         for (let i = 0; i < component.text.length; i++) {
                             let curLetter=component.text.substring(i, i + 1);
                             let span=null;                            
@@ -68,30 +73,34 @@ function createHypeType(aniName, aniFnc,speed){
                     );
                 });
             }
+            
+            console.log(htmlElement);
 
             // handle the play behavior
-            async function handle_startSequencePlaybackRequested() {
-                return window.widget.queue.awaitTask(new Promise(resolve => {
-                    let letterCount=document.querySelectorAll('#' +slugify(compositeFieldId)+ ' .letter').length;
-                    let animationDuration=1000+2*letterCount*aniSpeed;
-                    let animationDelay=0;
-                    let enterAnimationDuration=0;
-                    let exitAnimationDuration=0;
-                    if (field.animation && field.animation.static && field.animation.static.animationDuration) {
-                        animationDuration = field.animation.static.animationDuration.replace("s", "") * 1000;
-                    }
-                    if (field.animation && field.animation.enter && field.animation.enter.animationDelay) {
-                        animationDelay = field.animation.enter.animationDelay.replace("s", "") * 1000;
-                    }
-                    if (field.animation && field.animation.enter && field.animation.enter.animationDuration) {
-                        enterAnimationDuration = field.animation.enter.animationDuration.replace("s", "") * 1000;
-                    }
-                    if (field.animation && field.animation.exit && field.animation.exit.animationDuration) {
-                        exitAnimationDuration = field.animation.exit.animationDuration.replace("s", "") * 1000;
-                    }
-                    // call the animation and resolve the await when it ends.
-                    aniFnc("#" + slugify(compositeFieldId),function(){resolve();},Math.min(enterAnimationDuration+exitAnimationDuration+animationDuration-2*letterCount*aniSpeed),animationDelay);               
-                }));
+            async function handle_startSequencePlaybackRequested() {               
+              return window.widget.queue.awaitTask(new Promise(resolve => {
+                  const letters = Array.from(htmlElement.querySelectorAll('.letter'));
+                  const letterCount = letters.length;
+
+                  let animationDuration=1000+2*letterCount*aniSpeed;
+                  let animationDelay=0;
+                  let enterAnimationDuration=0;
+                  let exitAnimationDuration=0;
+                  if (field.animation && field.animation.static && field.animation.static.animationDuration) {
+                      animationDuration = field.animation.static.animationDuration.replace("s", "") * 1000;
+                  }
+                  if (field.animation && field.animation.enter && field.animation.enter.animationDelay) {
+                      animationDelay = field.animation.enter.animationDelay.replace("s", "") * 1000;
+                  }
+                  if (field.animation && field.animation.enter && field.animation.enter.animationDuration) {
+                      enterAnimationDuration = field.animation.enter.animationDuration.replace("s", "") * 1000;
+                  }
+                  if (field.animation && field.animation.exit && field.animation.exit.animationDuration) {
+                      exitAnimationDuration = field.animation.exit.animationDuration.replace("s", "") * 1000;
+                  }
+                  // call the animation and resolve the await when it ends.
+                  aniFnc(letters, resolve, Math.min(enterAnimationDuration+exitAnimationDuration+animationDuration-2*letterCount*aniSpeed),animationDelay);               
+              }));
             }
 
             // when animation stops, prepare the canvas for editing
@@ -103,6 +112,7 @@ function createHypeType(aniName, aniFnc,speed){
             async function handle_previewModeChanged(previewMode){
                 switch(previewMode){
                     case "static": 
+                    case "none": 
                         prepareHtml();
                         break;
                 }

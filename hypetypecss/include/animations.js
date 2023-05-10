@@ -1,10 +1,10 @@
-var thursday=async function(target,completeFnc,duration,delay){
+var thursday=async function(targets,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
-    targets: target + ' .letter',
+    targets,
     delay:delay})
   .add({
-    targets: target + ' .letter',
+    targets,
     scale: [0.3,1],
     opacity: [0,1],
     translateZ: 0,
@@ -12,7 +12,7 @@ var thursday=async function(target,completeFnc,duration,delay){
     duration: 600,
     delay: (el, i) => 70 * (i+1)
   }).add({
-    targets: target + ' .letter',
+    targets,
     opacity: 0,
     duration: 600,
     easing: "easeOutExpo",
@@ -22,7 +22,7 @@ var thursday=async function(target,completeFnc,duration,delay){
 var sunnyMorning=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
-    targets: target + ' .letter',
+    targets,
     delay:delay})
   .add({
     targets: target +' .letter',
@@ -33,7 +33,7 @@ var sunnyMorning=async function(target,completeFnc,duration,delay){
     duration: 950,
     delay: (el, i) => 70*i
   }).add({
-    targets: target + ' .letter',
+    targets,
     opacity: 0,
     duration: 600,
     easing: "easeOutExpo",
@@ -43,7 +43,7 @@ var sunnyMorning=async function(target,completeFnc,duration,delay){
 var beautifulQuestions=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
-    targets: target + ' .letter',
+    targets,
     delay:delay})
   .add({
     targets: target +' .letter',
@@ -52,7 +52,7 @@ var beautifulQuestions=async function(target,completeFnc,duration,delay){
     duration: 750,
     delay: (el, i) => 50 * i
   }).add({
-    targets: target + ' .letter',
+    targets,
     opacity: [0],
     duration: 300,
     translateY: [ 0,"1.1em"],
@@ -64,7 +64,7 @@ var beautifulQuestions=async function(target,completeFnc,duration,delay){
 var realityIsBroken=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
-    targets: target + ' .letter',
+    targets,
     delay:delay})
   .add({
     targets: target +' .letter',
@@ -90,7 +90,7 @@ var realityIsBroken=async function(target,completeFnc,duration,delay){
 var raisingStrong=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
-    targets: target + ' .letter',
+    targets,
     delay:delay})
   .add({
     targets: target +' .letter',
