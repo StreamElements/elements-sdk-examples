@@ -22,8 +22,6 @@ function createHypeType(aniName, aniFnc, speed) {
             // Define the HTML strucutre for your custom composite text field
 
             const htmlElement = document.createElement("div");
-            const elementId = slugify(compositeFieldId);
-            htmlElement.setAttribute('id', elementId);
 
             // parse the config.json
             const field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field
@@ -38,8 +36,6 @@ function createHypeType(aniName, aniFnc, speed) {
                  
                 field.text?.forEach(({ content }) => {
                     widget.api.interpolateTextContentComponents({ textContent: content }).forEach((component) => {
-                      console.log(component);
-
                         for (let i = 0; i < component.text.length; i++) {
                             let curLetter=component.text.substring(i, i + 1);
                             let span=null;                            
@@ -74,7 +70,6 @@ function createHypeType(aniName, aniFnc, speed) {
                 });
             }
             
-            console.log(htmlElement);
 
             // handle the play behavior
             async function handle_startSequencePlaybackRequested() {               
