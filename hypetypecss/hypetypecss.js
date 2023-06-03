@@ -7,6 +7,7 @@
 // anime.js is referenced here https://animejs.com/ also under MIT license
 
 function createHypeType(aniName, aniFnc, speed) {
+    console.log('hypeTypeCss'+ slugify(aniName))
     window.widget.compositeFields.registerCompositeFieldProvider({
         // register details that will be exposed to "add component" in the editor
         getCompositeFieldMetadata: () => ({
@@ -60,6 +61,7 @@ function createHypeType(aniName, aniFnc, speed) {
                                 span.innerHTML=" ";
                                 break;
                             }
+                            span.style.width=""; // can't have it or it will not render properly
                             htmlElement.appendChild(span);
                            
                             
@@ -138,7 +140,6 @@ function createHypeType(aniName, aniFnc, speed) {
                     return htmlElement;
                 },
                 async dispose() {
-                    console.log("dispose");
                     // Unsubscribe from event handlers
                     window.widget.events.off('previewModeChanged',handle_previewModeChanged );
                     window.widget.events.off('startSequencePlaybackRequested', handle_startSequencePlaybackRequested);

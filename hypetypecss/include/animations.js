@@ -2,6 +2,7 @@ var thursday=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
     targets: target,
+   opacity: [0,0],
     delay:delay})
   .add({
     targets: target,
@@ -23,6 +24,7 @@ var sunnyMorning=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
     targets: target,
+    opacity: [0,0],
     delay:delay})
   .add({
     targets: target,
@@ -44,16 +46,18 @@ var beautifulQuestions=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
     targets: target,
+    opacity: [0,0],
     delay:delay})
   .add({
     targets: target,
+    opacity: [0,1],
     translateY: ["1.1em", 0],
     translateZ: 0,
     duration: 750,
     delay: (el, i) => 50 * i
   }).add({
     targets: target,
-    opacity: [0],
+    opacity: 0,
     duration: 300,
     translateY: [ 0,"1.1em"],
     translateZ: 0,
@@ -65,9 +69,11 @@ var realityIsBroken=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
     targets: target,
+    opacity: [0,0],
     delay:delay})
   .add({
     targets: target,
+    opacity: [0,1],
     translateY: ["1.1em", 0],
     translateX: ["0.55em", 0],
     translateZ: 0,
@@ -91,6 +97,7 @@ var raisingStrong=async function(target,completeFnc,duration,delay){
   anime.timeline({loop: false,complete: completeFnc})
   .add({
     targets: target,
+    opacity: [0,0],
     delay:delay})
   .add({
     targets: target,
