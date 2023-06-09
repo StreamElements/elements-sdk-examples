@@ -75,7 +75,7 @@ function createHypeType(aniName, aniFnc, speed) {
 
             // handle the play behavior
             async function handle_startSequencePlaybackRequested() {               
-              return window.widget.queue.awaitTask(new Promise(resolve => {
+              return window.widget.queue.awaitTask(() => new Promise(resolve => {
                   const letters = Array.from(htmlElement.querySelectorAll('.letter'));
                   const letterCount = letters.length;
 
