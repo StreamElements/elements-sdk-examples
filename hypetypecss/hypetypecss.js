@@ -7,7 +7,6 @@
 // anime.js is referenced here https://animejs.com/ also under MIT license
 
 function createHypeType(aniName, aniFnc, speed) {
-    console.log('hypeTypeCss'+ slugify(aniName))
     window.widget.compositeFields.registerCompositeFieldProvider({
         // register details that will be exposed to "add component" in the editor
         getCompositeFieldMetadata: () => ({
@@ -102,6 +101,8 @@ function createHypeType(aniName, aniFnc, speed) {
 
             // when animation stops, prepare the canvas for editing
             async function handle_cancelSequencePlaybackRequested() {
+                const letters = Array.from(htmlElement.querySelectorAll('.letter'));
+                anime.remove(letters)
                 prepareHtml();
             }
 
