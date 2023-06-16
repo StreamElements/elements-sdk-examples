@@ -6,6 +6,8 @@
 
 // anime.js is referenced here https://animejs.com/ also under MIT license
 
+//set up a cache for htmls created
+const cache = {};
 function createHypeType(aniName, aniFnc, speed) {
     window.widget.compositeFields.registerCompositeFieldProvider({
         // register details that will be exposed to "add component" in the editor
@@ -21,7 +23,11 @@ function createHypeType(aniName, aniFnc, speed) {
         async createCompositeFieldInstance({ compositeFieldId, configState }) {
             // Define the HTML strucutre for your custom composite text field
 
-            const htmlElement = document.createElement("div");
+            // cache the html element so it keeps continuity during the element's life cycle
+            if (!cache[compositeFieldId+configState.referenceId]) {
+              cache[compositeFieldId+configState.referenceId] = document.createElement("div");
+            }  
+            const htmlElement = cache[compositeFieldId+configState.referenceId];
 
             // parse the config.json
             const field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field
