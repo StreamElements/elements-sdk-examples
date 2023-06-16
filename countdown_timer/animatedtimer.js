@@ -1,3 +1,4 @@
+// initiate a global cache object to cache compositefield implementations
 const cache = {};
 // Register a custom composite field
 window.widget.compositeFields.registerCompositeFieldProvider({
@@ -12,11 +13,14 @@ window.widget.compositeFields.registerCompositeFieldProvider({
 
   // now define the create flow (what happens when a user adds a custom field to the canvas)
   async createCompositeFieldInstance({ compositeFieldId, configState }) {
-    if (!cache[compositeFieldId]) {
-      cache[compositeFieldId] = document.createElement("div");
+    // cache the html element so it keeps continuity during the element's life cycle
+    if (!cache[compositeFieldId+configState.referenceId]) {
+      cache[compositeFieldId+configState.referenceId] = document.createElement("div");
     }  
-    const htmlElement = cache[compositeFieldId];
-    const field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field  
+    const htmlElement = cache[compositeFieldId+configState.referenceId];
+
+    // set some internal globals
+    let field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field  
     let fontSize=null;
     let targetDate = new Date();
     let timeWrapper1 = null;
@@ -36,6 +40,7 @@ window.widget.compositeFields.registerCompositeFieldProvider({
       htmlElement.innerHTML = "";
       htmlElement.classList.add("wrap");
       let countdown = document.createElement("div");
+      
       Object.assign(countdown.style,field.style);
       countdown.classList.add("countdown");  
 
@@ -59,7 +64,7 @@ window.widget.compositeFields.registerCompositeFieldProvider({
       timeWrapper3.setAttribute("data-init-value", "0");
       timeWrapper3.innerHTML = innerStructureHtml.replaceAll('{part}', 'sec');;
       countdown.appendChild(timeWrapper3);
-
+      
       // set background color
       let figures=Array.from(countdown.querySelectorAll('.figure'));
       for (var i in figures){
@@ -85,7 +90,10 @@ window.widget.compositeFields.registerCompositeFieldProvider({
     let countdown_interval=null;
 
     // initiate the timer
-    function startTimer(targetDate){    
+    function startTimer(targetDate){  
+      if (countdown_interval) {
+        clearInterval(countdown_interval) 
+      }  
       countdown_interval = setInterval(function () {
         let timerObject=getTimeLeft(targetDate);
         if (timerObject.total_seconds > 0) {
@@ -115,17 +123,20 @@ window.widget.compositeFields.registerCompositeFieldProvider({
     });
     document.fonts.ready.then(function () {
       document.fonts.onloadingdone=function(){
-        renderStaticState();   
+        // render the element after fonts are loaded so we can calculate the required size
+        renderStaticState(); 
+        
         startTimer(targetDate); 
       }
     });
     // handle the timer after things has changed in the field
-    let handle_configStateChanged=function (configState){
-      field = configState.settings.compositeFields[compositeFieldId];
+    let handle_configDataChanged=function (configData){
+      configState=getConfigState(configData,configState.referenceId);
+      field= configState.settings.compositeFields[compositeFieldId];
       renderStaticState();   
       startTimer(targetDate); 
     }
-    window.widget.events.on("configStateChanged",handle_configStateChanged)
+    window.widget.events.on("configDataChanged",handle_configDataChanged)
     return {
       get compositeFieldSchema() {
         const field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field
@@ -141,12 +152,20 @@ window.widget.compositeFields.registerCompositeFieldProvider({
       },
       async dispose() {
         // Unsubscribe from event handlers
+        window.widget.events.off("configDataChanged",handle_configDataChanged)
         clearInterval(countdown_interval);
       },
     };
   },
 });
-
+//get config state from config data
+function getConfigState(configData,referenceId){
+  for (let i in configData.configStates){
+    if (configData.configStates[i].referenceId==referenceId){
+      return configData.configStates[i];
+    }
+  }
+}
 // animate figure
 function animateFigure (el, value) {
 
