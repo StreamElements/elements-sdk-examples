@@ -70,8 +70,6 @@ function createHypeType(aniName, aniFnc, speed) {
                     );
                 });
             }
-            
-
             // handle the play behavior
             async function handle_startSequencePlaybackRequested() {               
               return window.widget.queue.awaitTask(() => new Promise(resolve => {
@@ -103,6 +101,9 @@ function createHypeType(aniName, aniFnc, speed) {
             async function handle_cancelSequencePlaybackRequested() {
                 const letters = Array.from(htmlElement.querySelectorAll('.letter'));
                 anime.remove(letters)
+                if (window.widget.queue.lockCount>0){
+                    window.widget.queue.unlock();
+                }
                 prepareHtml();
             }
 
