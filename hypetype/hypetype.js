@@ -230,9 +230,8 @@ widget.compositeFields.registerCompositeFieldProvider({
               if (curRevWordIndx == contentArr.length - 1) {
                 let ani = getAnimationByName(compositeFieldId + curRevWordIndx + "_" + curRevLetterIndx);
                 ani.addEventListener('complete', function () {
-                  ani.removeEventListener("complete");
-                  clearTimeouts();
-                  resolve();
+                  //ani.removeEventListener("complete");
+                  handle_animationCleanup();
                 });
               } else {
                 curRevWordIndx++;
@@ -246,8 +245,17 @@ widget.compositeFields.registerCompositeFieldProvider({
           if (exitTimersCount == content.length) {
             clearInterval(exitInterval);
           }
-        }, speed)
+        }, speed);
+        // handle end of play (stop or finish)
+        window.widget.events.on('cancelSequencePlaybackRequested', handle_animationCleanup);
+        function handle_animationCleanup() {
+          window.widget.events.off('cancelSequencePlaybackRequested', handle_animationCleanup);
+          clearTimeouts();
+          resolve();
+        }
       }));
+          // stop all intervals when playback is cancelled
+      
     }
     // remove created lottie animations
     function removeRelatedLottie(compositeFieldId) {
@@ -270,14 +278,7 @@ widget.compositeFields.registerCompositeFieldProvider({
         }
       }
     }
-    // stop all intervals when playback is cancelled
-    function handle_cancelSequencePlaybackRequested() {
-      if ((interval || exitInterval) && window.widget.queue.lockCount > 0) {
-        window.widget.queue.unlock();
-      }
-      clearTimeouts();
-      render(true);
-    }
+
     // handle config data change - mainly address preloading fonts
     async function handle_configDataChanged(configData) {
       configState = getConfigState(configData, configState.referenceId);
@@ -314,7 +315,7 @@ widget.compositeFields.registerCompositeFieldProvider({
     }
     // Define what happens when the editor, widget container (or your code) sends an emulation request 
     window.widget.events.on('startSequencePlaybackRequested', handle_startSequencePlaybackRequested);
-    window.widget.events.on('cancelSequencePlaybackRequested', handle_cancelSequencePlaybackRequested);
+   
     window.widget.events.on("configDataChanged", handle_configDataChanged);
     window.widget.events.on("previewModeChanged", handle_previewModeChanged);
 
@@ -344,7 +345,6 @@ widget.compositeFields.registerCompositeFieldProvider({
         // Unsubscribe from event handlers
         removeRelatedLottie(compositeFieldId);
         window.widget.events.off('startSequencePlaybackRequested', handle_startSequencePlaybackRequested);
-        window.widget.events.off('cancelSequencePlaybackRequested', handle_cancelSequencePlaybackRequested);
         window.widget.events.off("configDataChanged", handle_configDataChanged);
         window.widget.events.off("previewModeChanged", handle_previewModeChanged);
 
