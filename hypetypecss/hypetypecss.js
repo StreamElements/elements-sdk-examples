@@ -98,20 +98,23 @@ function createHypeType(aniName, aniFnc, speed) {
                   if (field.animation && field.animation.exit && field.animation.exit.animationDuration) {
                       exitAnimationDuration = field.animation.exit.animationDuration.replace("s", "") * 1000;
                   }
-                  // call the animation and resolve the await when it ends.
-                  aniFnc(letters, resolve, Math.min(enterAnimationDuration+exitAnimationDuration+animationDuration-2*letterCount*aniSpeed),animationDelay);               
-              }));
+                  // call the animation and resolve the await when it ends or when browser stops.
+                  aniFnc(letters, handle_animationEnd, Math.min(enterAnimationDuration+exitAnimationDuration+animationDuration-2*letterCount*aniSpeed),animationDelay);               
+                  window.widget.events.on('cancelSequencePlaybackRequested', handle_animationEnd);
+                  // resolve & cleanup function
+                  async function handle_animationEnd() {
+                        window.widget.events.off('cancelSequencePlaybackRequested', handle_animationEnd);
+                        const letters = Array.from(htmlElement.querySelectorAll('.letter'));
+                        anime.remove(letters)
+                        resolve();
+                    }
+                }));
+                // Define what happens when the editor, widget container (or your code) sends a stop playback request
+             
             }
 
             // when animation stops, prepare the canvas for editing
-            async function handle_cancelSequencePlaybackRequested() {
-                const letters = Array.from(htmlElement.querySelectorAll('.letter'));
-                anime.remove(letters)
-                if (window.widget.queue.lockCount>0){
-                    window.widget.queue.unlock();
-                }
-                prepareHtml();
-            }
+            
 
             // when animation ends in the editor - prepare the canvas for editing
             async function handle_previewModeChanged(previewMode){
@@ -128,8 +131,7 @@ function createHypeType(aniName, aniFnc, speed) {
             // Define what happens when the editor, widget container (or your code) sends an emulation request  
             window.widget.events.on('startSequencePlaybackRequested', handle_startSequencePlaybackRequested);
 
-            // Define what happens when the editor, widget container (or your code) sends a stop playback request
-            window.widget.events.on('cancelSequencePlaybackRequested', handle_cancelSequencePlaybackRequested);
+
 
             // Define the editor's setting UI for this composite field
             prepareHtml();
@@ -151,7 +153,7 @@ function createHypeType(aniName, aniFnc, speed) {
                     // Unsubscribe from event handlers
                     window.widget.events.off('previewModeChanged',handle_previewModeChanged );
                     window.widget.events.off('startSequencePlaybackRequested', handle_startSequencePlaybackRequested);
-                    window.widget.events.off('cancelSequencePlaybackRequested', handle_cancelSequencePlaybackRequested);
+                   
                 },
             };
 
