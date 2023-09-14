@@ -36,7 +36,7 @@ window.widget.compositeFields.registerCompositeFieldProvider({
 
     function handle_startSequencePlaybackRequested() {
       // this will block the queue while alert is being played, until done or canceled
-      return window.widget.queue.awaitTask(new Promise(resolve => {
+      return window.widget.queue.awaitTask(()=>new Promise(resolve => {
         let animationTimeoutHandle = null;
 
         renderPlayingState();
