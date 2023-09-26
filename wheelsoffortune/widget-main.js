@@ -232,7 +232,6 @@ widget.compositeFields.registerCompositeFieldProvider({
           }
 
         function handle_chatEventRecieved({ chatMessage }){
-            console.log(chatMessage)
             const [command] = chatMessage.textMessageDetails.message.split(' '); // Split by empty space to get each individual word
             switch (command) {             
                  case managedData.spinCommand:
@@ -282,7 +281,6 @@ widget.compositeFields.registerCompositeFieldProvider({
         function initWheel() {
             if (managedData.options){
                 let index=0;
-                console.log(managedData);
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 sectors=[];
                 for (let option of managedData.options) {
@@ -330,7 +328,6 @@ widget.compositeFields.registerCompositeFieldProvider({
                 } else {
                 // If the wheel is already spinning, don't do anything
                 angVel=0;
-                console.log("Spin already in progress");
             }
         }
         function stopSpin(){

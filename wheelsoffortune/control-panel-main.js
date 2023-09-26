@@ -105,8 +105,10 @@ checkboxes.forEach(checkbox => {
         if (selectedOptions.length==0){
             dropdownMenuButton.textContent="select permissions" ;
         }
+        managedData.changedKey="additions";
         updateManagedData();
         storeManagedData();
+        managedData.changedKey="";
     });
 });
 
@@ -144,7 +146,8 @@ async function init() {
                 {label:""},
                 {label:""}
             ],
-            "spinCommand": "!spinwheel"
+            "spinCommand": "!spinwheel",
+            "spinPermissions": "Moderators"
         }
         storeManagedData(); 
     }else{
@@ -159,10 +162,8 @@ async function handle_managedDataChanged(){
 }
 // handle a stop comming from the widget
 function handle_persistentStorageVariableValueChanged(keyvaluepair){
-    console.log(keyvaluepair);
     if (keyvaluepair.key=="wheelIsSpinning"){
         if (managedData.spin != keyvaluepair.value ){
-            console.log("persistent data changes managed data");
             if  (!keyvaluepair.value){
                 handle_stop();
             }else{
