@@ -2,6 +2,10 @@
     "version": 2,
     "resources": {
         "html": "./widget.html"
+    },
+    "securityPolicy":{
+        "allow":{"hosts":["cdnjs.cloudflare.com","elementsusercontent.com"]}
     }
+    
     
 }

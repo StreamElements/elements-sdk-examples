@@ -8,21 +8,22 @@
 
 //set up a cache for htmls created
 const cache = {};
-function createHypeType(aniName, aniFnc, speed) {
+function createHypeType(aniName, aniFnc, speed,icon) {
     window.widget.compositeFields.registerCompositeFieldProvider({
         // register details that will be exposed to "add component" in the editor
         getCompositeFieldMetadata: () => ({
             type: 'hypeTypeCss'+ slugify(aniName),
             displayName: 'Hype Type - ' + aniName,
             description: 'Animate letters with css animation',
-            previewImageUrl: import.meta.resolve("./images/text_rotation_angleup_white_24dp.svg"),
+            previewImageUrl: icon,
             defaultMimeType: "text/multiline",
             defaultBaseType: "text"
         }),
         // override the base text field rendering
         async createCompositeFieldInstance({ compositeFieldId, configState }) {
             // Define the HTML strucutre for your custom composite text field
-
+            const DEFAULT_TEXT_CONTENT_VALUE = 'Enter text to animate';
+            
             // cache the html element so it keeps continuity during the element's life cycle
             if (!cache[compositeFieldId+configState.referenceId]) {
               cache[compositeFieldId+configState.referenceId] = document.createElement("div");
@@ -31,54 +32,58 @@ function createHypeType(aniName, aniFnc, speed) {
 
             // parse the config.json
             const field = configState.settings.compositeFields[compositeFieldId]; // get the data for this specific field
+            const textContentOrDefaultValue = field.text?.[0]?.content || DEFAULT_TEXT_CONTENT_VALUE; // set default value - this will be returned as value for the editor
             const aniSpeed=speed;
 
             // prepare the html for rendering
-            function prepareHtml() {              
+            function prepareHtml() {     
+                console.log("prepare");         
                 htmlElement.innerHTML="";
                 // set style to the main element
                 Object.assign(htmlElement.style, field.style);
                  // interpulate the binded data and split the text into single letter spans
-                 
-                field.text?.forEach(({ content }) => {
-                    widget.api.interpolateTextContentComponents({ textContent: content }).forEach((component) => {
-                        for (let i = 0; i < component.text.length; i++) {
-                            let curLetter=component.text.substring(i, i + 1);
-                            let span=null;                            
-                            switch(curLetter){
-                             default:    
-                                span = document.createElement('span');                         
-                                span.appendChild(document.createTextNode(curLetter));
-                                if (component.isHighlighted) {
-                                    Object.assign(span.style, field.highlightedStyle);
-                                } else {
-                                    Object.assign(span.style, field.style);
-                                }
-                                span.classList.add("letter");
-                               
-                                break;
-                            case "\n":
-                                span = document.createElement('br');    
-                                htmlElement.appendChild(document.createElement("br"));
-                                break
-                            case " ":
-                                span = document.createElement('span');
-                                span.innerHTML=" ";
-                                break;
+                             
+                widget.api.interpolateTextContentComponents({ textContent: textContentOrDefaultValue }).forEach((component) => {
+                    for (let i = 0; i < component.text.length; i++) {
+                        let curLetter=component.text.substring(i, i + 1);
+                        let span=null;                            
+                        switch(curLetter){
+                            default:    
+                            span = document.createElement('span');                         
+                            span.appendChild(document.createTextNode(curLetter));
+                            if (component.isHighlighted) {
+                                Object.assign(span.style, field.highlightedStyle);
+                            } else {
+                                Object.assign(span.style, field.style);
                             }
-                            span.style.width=""; // can't have it or it will not render properly
-                            htmlElement.appendChild(span);
-                           
+                            span.classList.add("letter");
                             
+                            break;
+                        case "\n":
+                            span = document.createElement('br');    
+                            htmlElement.appendChild(document.createElement("br"));
+                            break
+                        case " ":
+                            span = document.createElement('span');
+                            span.innerHTML=" ";
+                            break;
                         }
-                       
+                        span.style.width=""; // can't have it or it will not render properly
+                        htmlElement.appendChild(span);
+                        
+                        
                     }
-                    );
-                });
+                    
+                }
+                );
+                
             }
             // handle the play behavior
-            async function handle_startSequencePlaybackRequested() {               
+            async function handle_startSequencePlaybackRequested() {          
+              prepareHtml();     
               return window.widget.queue.awaitTask(() => new Promise(resolve => {
+                  prepareHtml();
+
                   const letters = Array.from(htmlElement.querySelectorAll('.letter'));
                   const letterCount = letters.length;
 
@@ -141,9 +146,13 @@ function createHypeType(aniName, aniFnc, speed) {
                         type: 'hypeTypeCss' + slugify(aniName),
                         baseType: 'text',
                         placeholders: {},
-                        value: htmlElement.innerHTML || 'Enter your text',
                         mimeType: "text/multiline",
-                        basseType: "text"
+                        basseType: "text",
+                        text: [
+                            { 
+                                content: textContentOrDefaultValue
+                            }
+                          ]
                     };
                 },
                 get htmlElement() {
@@ -151,6 +160,7 @@ function createHypeType(aniName, aniFnc, speed) {
                 },
                 async dispose() {
                     // Unsubscribe from event handlers
+                    console.log("dispose");
                     window.widget.events.off('previewModeChanged',handle_previewModeChanged );
                     window.widget.events.off('startSequencePlaybackRequested', handle_startSequencePlaybackRequested);
                    
@@ -170,7 +180,10 @@ const slugify = str =>
         .replace(/[\s_-]+/g, '-')
         .replace(/^-+|-+$/g, '');
 
-
+let icon="";
+if (import.meta.resolve){
+    icon=import.meta.resolve("./images/text_rotation_angleup_white_24dp.svg");
+}
 // create different animations from the same code.
 createHypeType("Thursday",thursday,50);
 createHypeType("Sunny Morning",sunnyMorning,50);
