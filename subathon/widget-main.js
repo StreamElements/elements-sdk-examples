@@ -71,8 +71,8 @@ window.widget.serviceModules.registerServiceModuleProvider({
               "t1": [true, 360],
               "t2": [true, 480],
               "t3": [true, 600],
-              "tip": [true, 600],
-              "cheer": [true, 600],
+              "tip": [true, 40],
+              "cheer": [true, 20],
               "follow": [true, 60],
 
           },
@@ -200,6 +200,7 @@ window.widget.serviceModules.registerServiceModuleProvider({
 
     // Define what happens when we receive an Activity]
     async function handle_activityReceived({activity}) {
+      if (activity.isMock)return;
       if (window.widget.persistentStorage.getValue({ key: "state" })!="play") return; // only get events when the timer is running
       let str = "";
       // Update subathon end timestamp
@@ -225,7 +226,10 @@ window.widget.serviceModules.registerServiceModuleProvider({
           break;
         case 'tip':
           str = managedData.timeAdditions.tip[1];
-          if (isInt(str) && managedData.timeAdditions.tip[0]) addTime(parseInt(str, 10));
+          var amount=Math.floor(parseInt(str, 10)*activity.data.amount);
+          window.widget.bindableData.setValue({key:"subathon_tipAddition",value:amount});
+          console.log(amount);
+          if (isInt(str) && managedData.timeAdditions.tip[0]) addTime(amount);
           break;
         case 'follow':
           str = managedData.timeAdditions.follow[1];
@@ -233,7 +237,10 @@ window.widget.serviceModules.registerServiceModuleProvider({
           break;
         case 'cheer':
           str = managedData.timeAdditions.cheer[1];
-          if (isInt(str) && managedData.timeAdditions.cheer[0]) addTime(parseInt(str, 10));
+          var amount=Math.floor(parseInt(str, 10)*activity.data.amount/500);
+          console.log(amount);
+          window.widget.bindableData.setValue({key:"subathon_tipAddition",value:amount});
+          if (isInt(str) && managedData.timeAdditions.cheer[0]) addTime(amount);
           break;
       }
     }

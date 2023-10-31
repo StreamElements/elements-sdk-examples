@@ -24,8 +24,8 @@ window.controlPanel.serviceModules.registerServiceModuleProvider({
                     "t2": [true, 480],
                     "t3": [true, 600],
                     "sub": [true, 360],
-                    "tip": [true, 600],
-                    "cheer": [true, 240],
+                    "tip": [true, 40],
+                    "cheer": [true, 20],
                     "follow": [true, 60],
 
                 },
@@ -114,6 +114,8 @@ window.controlPanel.serviceModules.registerServiceModuleProvider({
             managedData.timeAdditions.follow=[document.getElementById("follow-enabled").checked,formatTime2sec(document.getElementById("follow-duration").value)];
             managedData.commands.pause=document.getElementById("pause-command").value;
             managedData.commands.resume=document.getElementById("resume-command").value;
+            managedData.commands.addTime=document.getElementById("addtime-command").value;
+           
             managedData.messages.pasueMessage=document.getElementById("pause-message").value;
             managedData.messages.endMessage=document.getElementById("end-message").value;
             console.log(managedData.timeAdditions);
