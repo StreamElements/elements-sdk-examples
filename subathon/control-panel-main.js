@@ -36,6 +36,9 @@ window.controlPanel.serviceModules.registerServiceModuleProvider({
             storeManagedData();
         }
         updateTimer();
+        if (window.controlPanel.persistentStorage.getValue({ key: "state" })=="play"){
+            startTimer();
+        }
         // check for changes in persistent data
 
         // register for managed data changes
