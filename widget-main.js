@@ -290,7 +290,7 @@ window.widget.serviceModules.registerServiceModuleProvider({
       }
       switch ( window.widget.persistentStorage.getValue({ key: "state" })){
         case "play":
-          window.widget.bindableData.setValue({ key: "subathon_timeleft", value: getFormmattedTimerLeft() });
+          window.widget.bindableData.setValue({ key: "subathon_timeleft", value: getFormattedTimerLeft() });
           if (window.widget.persistentStorage.getValue({ key: "targetDate" }) - Date.now()<=0){
             window.widget.bindableData.setValue({key:"subathon_message",value:managedData.messages.endMessage});
           }else{
@@ -331,7 +331,7 @@ window.widget.serviceModules.registerServiceModuleProvider({
 
 
 // service functions
-function getFormmattedTimerLeft() {
+function getFormattedTimerLeft() {
   var currentDuration = Math.max(0,window.widget.persistentStorage.getValue({ key: "targetDate" }) - Date.now()) ;
     return sec2formatTime(currentDuration / 1000);
 }
