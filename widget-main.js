@@ -147,7 +147,12 @@ window.widget.serviceModules.registerServiceModuleProvider({
     window.widget.events.on("widgetEventReceived",handle_widgetEventReceived)
     // get managed data 
     async function fetchFreshManagedData() {
-      managedData = await window.widget.api.fetchManagedData();
+      try {
+        managedData = await window.widget.api.fetchManagedData();
+      } catch (error) {
+        console.error("Error fetching managed data:", error);
+        // handle the error or provide a fallback mechaninsm if needed
+      }
     }
     // handle chat events
 
@@ -203,44 +208,62 @@ window.widget.serviceModules.registerServiceModuleProvider({
       if (activity.isMock)return;
       if (window.widget.persistentStorage.getValue({ key: "state" })!="play") return; // only get events when the timer is running
       let str = "";
+      let amount = 0;
       // Update subathon end timestamp
       switch (activity.type) {
         case 'subscriber':
           if (activity.bulkGifted) { // Ignore gifting event and count only real subs
             return;
           }
+          // original code handled gifted subs without properly checking conditions or handling different tiers.
           switch (activity.data.tier) {
             case "1000":
               str = managedData.timeAdditions.t1[1];
-              if (isInt(str) && managedData.timeAdditions.t1[0]) addTime(parseInt(str, 10));
+              if (isInt(str) && managedData.timeAdditions.t1[0]) {
+                amount = parseInt(str, 10);
+                addTime(amount);
+              }
               break;
             case "2000":
               str = managedData.timeAdditions.t2[1];
-              if (isInt(str) && managedData.timeAdditions.t2[0]) addTime(parseInt(str, 10));
+              if (isInt(str) && managedData.timeAdditions.t2[0]) {
+                amount = parseInt(str, 10);
+                addTime(amount);
+              }
               break;
             case "3000":
               str = managedData.timeAdditions.t3[1];
-              if (isInt(str) && managedData.timeAdditions.t3[0]) addTime(parseInt(str, 10));
+              if (isInt(str) && managedData.timeAdditions.t3[0]) {
+                amount = parseInt(str, 10);
+                addTime(amount);
+              }
               break;
           }
           break;
+        // donation  
         case 'tip':
           str = managedData.timeAdditions.tip[1];
-          var amount=Math.floor(parseInt(str, 10)*activity.data.amount);
-          window.widget.bindableData.setValue({key:"subathon_tipAddition",value:amount});
-          console.log(amount);
-          if (isInt(str) && managedData.timeAdditions.tip[0]) addTime(amount);
+          amount = Math.floor(parseInt(str, 10) * activity.data.amount);
+          if (isInt(str) && managedData.timeAdditions.tip[0]) {
+            addTime(amount);
+          }
           break;
+    
         case 'follow':
           str = managedData.timeAdditions.follow[1];
-          if (isInt(str) && managedData.timeAdditions.follow[0]) addTime(parseInt(str, 10));
+          if (isInt(str) && managedData.timeAdditions.follow[0]) {
+            amount = parseInt(str, 10);
+            addTime(amount);
+          }
           break;
+    
         case 'cheer':
           str = managedData.timeAdditions.cheer[1];
-          var amount=Math.floor(parseInt(str, 10)*activity.data.amount/500);
+          amount = Math.floor(parseInt(str, 10) * activity.data.amount / 500);
           console.log(amount);
-          window.widget.bindableData.setValue({key:"subathon_tipAddition",value:amount});
-          if (isInt(str) && managedData.timeAdditions.cheer[0]) addTime(amount);
+          if (isInt(str) && managedData.timeAdditions.cheer[0]) {
+            addTime(amount);
+          }
           break;
       }
     }
@@ -337,8 +360,8 @@ function getFormattedTimerLeft() {
 }
 
 
-function sec2formatTime(num) {
-  return padTo2Digits(Math.floor(num / 3600)) + ":" + padTo2Digits(Math.floor((num % 3600) / 60)) + ":" + padTo2Digits(Math.floor(num % 60));
+function sec2FormatTime(num) {
+  return padTo2Digits(Math.floor(num / 3600)) + " : " + padTo2Digits(Math.floor((num % 3600) / 60)) + " : " + padTo2Digits(Math.floor(num % 60));
 }
 
 function padTo2Digits(num) {

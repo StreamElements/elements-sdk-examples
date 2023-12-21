@@ -116,7 +116,7 @@ window.controlPanel.serviceModules.registerServiceModuleProvider({
             managedData.commands.resume=document.getElementById("resume-command").value;
             managedData.commands.addTime=document.getElementById("addtime-command").value;
            
-            managedData.messages.pasueMessage=document.getElementById("pause-message").value;
+            managedData.messages.pauseMessage=document.getElementById("pause-message").value;
             managedData.messages.endMessage=document.getElementById("end-message").value;
             console.log(managedData.timeAdditions);
         }
