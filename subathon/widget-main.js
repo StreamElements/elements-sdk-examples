@@ -219,7 +219,7 @@ window.widget.serviceModules.registerServiceModuleProvider({
               if (isInt(str) && managedData.timeAdditions.t2[0]) addTime(parseInt(str, 10));
               break;
             case "3000":
-              str = managedData.timeAdditions.t2[1];
+              str = managedData.timeAdditions.t3[1];
               if (isInt(str) && managedData.timeAdditions.t3[0]) addTime(parseInt(str, 10));
               break;
           }
